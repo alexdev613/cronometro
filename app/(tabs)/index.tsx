@@ -1,11 +1,13 @@
 import { useRef, useState } from "react";
-import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { View, Image, StyleSheet, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
 
 export default function App() {
   const [numero, setNumero] = useState<string>("00:00:00"); // Tempo formatado exibido na tela
   const [botao, setBotao] = useState("VAI"); // Texto do botão principal: "VAI" ou "PARAR"
   const [ultimo, setUltimo] = useState<null | string>(null); // Armazena o último tempo registrado antes de zerar
-  
+
+  const [voltas, setVoltas] = useState<string[]>([]); // Estado para controle das voltas
+
   // Refs armazenam valores entre renderizações sem causar re-render, ideal para controle interno como contadores ou timers
   const timer = useRef<NodeJS.Timeout | null>(null); // Armazena o ID do setInterval
   const ss = useRef(0);
@@ -68,6 +70,17 @@ export default function App() {
 
   }
 
+  function marcarVolta() {
+    if (numero === "00:00:00") return; // Não faz nada se o tempo estiver zerado
+    setVoltas((prev) => [numero, ...prev]); // Salva o tempo atual no início da lista
+  }
+
+  function limparVoltas() {
+    if (numero === "00:00:00" && timer.current === null) {
+      setVoltas([]);
+    }
+  }
+
   return (
     <View style={styles.container}>
 
@@ -86,12 +99,37 @@ export default function App() {
           <Text style={styles.btnTexto}>Limpar</Text>
         </TouchableOpacity>
       </View>
+      
+      <View style={[styles.btnArea, { marginTop: 20} ]}>
+        <TouchableOpacity
+          style={[styles.btn, numero === "00:00:00" && { opacity: 0.5} ]}
+          onPress={marcarVolta}
+          disabled={numero === "00:00:00"}
+        >
+          <Text style={styles.btnTexto}>Volta</Text>
+        </TouchableOpacity>
+
+        {voltas.length > 0 && (
+          <TouchableOpacity style={styles.btn} onPress={limparVoltas}>
+            <Text style={styles.btnTexto}>Limpar Voltas </Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
 
       <View style={styles.areaUltima}>
         <Text style={styles.textoCorrida}>
           {ultimo ? "Último tempo: " + ultimo : ""}
         </Text>
       </View>
+
+      <ScrollView style={styles.voltasArea}>
+        {voltas.map((tempo, index) => (
+          <Text key={index} style={styles.voltaTexto}>
+            Volta {voltas.length - index}: {tempo}
+          </Text>
+        ))}
+      </ScrollView>
 
     </View>
   )
@@ -136,5 +174,15 @@ const styles = StyleSheet.create({
     fontSize: 21,
     color: "#FFF",
     fontStyle: "italic"
-  }
+  },
+  voltasArea: {
+    marginTop: 20,
+    maxHeight: 100,
+    width: "90%"
+  },
+  voltaTexto: {
+    color: "#FFF",
+    fontSize: 18,
+    marginBottom: 5
+  },
 });
