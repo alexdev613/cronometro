@@ -1,50 +1,74 @@
-# Welcome to your Expo app 👋
+# ⏱️ App de Cronômetro com Voltas
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+<p align="center">
+  <img src="./assets//images/mockup.png" alt="Cronometro App Mockup" width="300"/>
+</p>
 
-## Get started
+**Um cronômetro simples e funcional desenvolvido com React Native + Expo, com suporte a múltiplas voltas, controle preciso de tempo, e uma interface intuitiva!**
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## 📱 Funcionalidades
 
-2. Start the app
+- Iniciar, Pausar e Zerar o cronômetro
+- Registrar múltiplas voltas com exibição sequencial
+- Último tempo salvo após zerar
+- Modal de confirmação para zerar voltas
+- Controle inteligente do estado de bloqueio para evitar ações indesejadas
 
-   ```bash
-    npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 🛠️ Tecnologias utilizadas
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- [React Native](https://reactnative.dev/)
+- [Expo](https://expo.dev/)
+- Hooks (`useState`, `useRef`)
+- Componentes estilizados manualmente
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## Get a fresh project
+---
 
-When you're ready, run:
+## 📝 Commit principal
 
 ```bash
-npm run reset-project
+feat: Implementação do modal de confirmação para limpar voltas com sua estilização. Adicionamos o estado `bloquearCronometro` para impedir nova contagem com voltas da contagem anterior. Atualizações das funções `vai` e `limpar` para respeitarem a lógica de bloqueio. Atualizada a função `limparVoltas` para também fechar o modal e desbloquear o cronômetro. E implementamos renderização condicional dos botões 'Volta' e 'Limpar Voltas' para refletir o estado atual do cronômetro e das voltas.
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 🌍 English Version
 
-To learn more about developing your project with Expo, look at the following resources:
+**A simple and functional stopwatch built with React Native + Expo, featuring lap tracking, clean UI, and safe action confirmation!**
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### 📱 Features
 
-## Join the community
+- Start, Pause, and Reset timer
+- Lap registration with time history
+- Shows last recorded time
+- Confirmation modal before clearing laps
+- Smart lock state to avoid unintentional actions
 
-Join our community of developers creating universal apps.
+### 🛠️ Tech Stack
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- React Native
+- Expo
+- Functional Components and Hooks
+
+---
+
+## 💡 Screenshot
+
+```
+![App Screenshot](./assets/images/mockup.png)
+```
+
+---
+
+## 📬 Contato
+
+Desenvolvido com carinho por **Alex** 💙  
+Contato: [alexjose68@hotmail.com]
+
+---
+
+> **“Feito na paz e no código.”**
