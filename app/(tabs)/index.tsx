@@ -1,70 +1,69 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { View, Image, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-// Variáveis dora do componente - elas não resetam entre renderizações
-let timer: null | any = null; // Armazena o identificador do setInterval
-let ss = 0; // Segundos
-let mm = 0; // Minutos
-let hh = 0; // Horas
-
 export default function App() {
-  const [numero, setNumero] = useState<string>("00:00:00"); // Estado que representa o tempo atual formatado
-  const [botao, setBotao] = useState("VAI"); // Estado que controla botão principa ("VAI" ou "PARAR")
-  const [ultimo, setUltimo] = useState<null | string | number>(null); // Estado que guarda o último tempo registrado ao limpar
+  const [numero, setNumero] = useState<string>("00:00:00"); // Tempo formatado exibido na tela
+  const [botao, setBotao] = useState("VAI"); // Texto do botão principal: "VAI" ou "PARAR"
+  const [ultimo, setUltimo] = useState<null | string>(null); // Armazena o último tempo registrado antes de zerar
+  
+  // Refs armazenam valores entre renderizações sem causar re-render, ideal para controle interno como contadores ou timers
+  const timer = useRef<NodeJS.Timeout | null>(null); // Armazena o ID do setInterval
+  const ss = useRef(0);
+  const mm = useRef(0);
+  const hh = useRef(0);
 
   function vai() {
-    // Se o timer já estiver rodando, interrompe ele
-    if (timer !== null) {
-      clearInterval(timer); // Para o setInterval
-      timer = null; // Marca como parado
+    if (timer.current !== null) {
+      // Timer já está rodando: vamos parar ele
+      clearInterval(timer.current);
+      timer.current = null; // Marca como parado
       setBotao("VAI");
 
     } else {
-      // Se o timer não estiver rodando, começa a contagem
-      timer = setInterval(() => {
-        ss++;  // Incrementa segundos
+      // Timer está parado: iniciamos o cronômetro
+      timer.current = setInterval(() => {
+        ss.current++;
 
-        // Se segundos chear a 60, zera e incremeta minutos
-        if (ss == 60) {
-          ss = 0;
-          mm++;
+        // Se segundos chegar a 60, zera e incrementa minutos
+        if (ss.current === 60) {
+          ss.current = 0;
+          mm.current++;
         }
 
-        // Se minutos chegar a 60, zera e incrementa minutos
-        if (mm == 60) {
-          mm = 0;
-          hh++;
+        // Se minutos chegar a 60, zera e incrementa horas
+        if (mm.current === 60) {
+          mm.current = 0;
+          hh.current++;
         }
 
-        // Formata o tempo em "hh:mm:ss" com zero à esquerda se cada variável de tempo for menor que 0
+        // Formata o tempo como "hh:mm:ss", adicionando zero à esquerda quando necessário
         let format =
-          (hh < 10 ? "0" + hh : hh) + ":"
-          + (mm < 10 ? "0" + mm : mm) + ":"
-          + (ss < 10 ? "0" + ss : ss);
+          (hh.current < 10 ? "0" + hh.current : hh.current) + ":" +
+          (mm.current < 10 ? "0" + mm.current : mm.current) + ":" +
+          (ss.current < 10 ? "0" + ss.current : ss.current);
 
-        setNumero(format); // Atualiza o estado com o tempo formatado
+        setNumero(format); // Atualiza a tela com o novo tempo
 
       }, 1000); // Executa a cada segundo
 
-      setBotao("PARAR"); // Altera o texto do botão para "PARAR"
+      setBotao("PARAR");
     }
   }
 
   function limpar() {
-    // Para o timer, se estiver rodando
-    if (timer !== null) {
-      clearInterval(timer);
-      timer = null;
+    // Se o timer estiver rodando, vamos parar ele
+    if (timer.current !== null) {
+      clearInterval(timer.current);
+      timer.current = null;
     }
 
-    // Salva o último tempo no estado `ultimo` antes de resetar
+    /// Salva o tempo atual como "ultimo" antes de zerar o numero
     setUltimo(numero);
-
-    // Reseta o tempo atual e as variáveis de controle
+    // Zera o tempo na tela e os contadores
     setNumero("00:00:00");
-    ss = 0;
-    mm = 0;
-    hh = 0;
+    ss.current = 0;
+    mm.current = 0;
+    hh.current = 0;
     setBotao("VAI");
 
   }
