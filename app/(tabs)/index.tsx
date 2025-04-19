@@ -8,6 +8,10 @@ export default function App() {
 
   const [voltas, setVoltas] = useState<string[]>([]); // Estado para controle das voltas
 
+  const [showModal, setShowModal] = useState(false);
+
+  const [bloquearCronometro, setBloquearCronometro] = useState(false);
+
   // Refs armazenam valores entre renderizações sem causar re-render, ideal para controle interno como contadores ou timers
   const timer = useRef<NodeJS.Timeout | null>(null); // Armazena o ID do setInterval
   const ss = useRef(0);
@@ -15,6 +19,11 @@ export default function App() {
   const hh = useRef(0);
 
   function vai() {
+    if (bloquearCronometro) {
+      alert("Você precisa limpar as voltas anteriores antes de iniciar uma nova contagem!");
+      return; // para impedir a execução da função
+    }
+
     if (timer.current !== null) {
       // Timer já está rodando: vamos parar ele
       clearInterval(timer.current);
@@ -68,6 +77,10 @@ export default function App() {
     hh.current = 0;
     setBotao("VAI");
 
+    if (voltas.length > 0) {
+      setBloquearCronometro(true); // Ativa o bloqueio até que as voltas sejam apagadas
+    }
+
   }
 
   function marcarVolta() {
@@ -76,8 +89,11 @@ export default function App() {
   }
 
   function limparVoltas() {
+    // Só permite limpar voltas se o cronômetro estiver zerado e parado
     if (numero === "00:00:00" && timer.current === null) {
       setVoltas([]);
+      setBloquearCronometro(false);
+      setShowModal(false);
     }
   }
 
@@ -96,33 +112,35 @@ export default function App() {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.btn} onPress={limpar}>
-          <Text style={styles.btnTexto}>Limpar</Text>
+          <Text style={styles.btnTexto}>Zerar</Text>
         </TouchableOpacity>
       </View>
-      
-      <View style={[styles.btnArea, { marginTop: 20} ]}>
-        <TouchableOpacity
-          style={[styles.btn, numero === "00:00:00" && { opacity: 0.5} ]}
-          onPress={marcarVolta}
-          disabled={numero === "00:00:00"}
-        >
-          <Text style={styles.btnTexto}>Volta</Text>
-        </TouchableOpacity>
 
-        {voltas.length > 0 && (
-          <TouchableOpacity style={styles.btn} onPress={limparVoltas}>
+      {/* Renderização dos botões que controlam as voltas */}
+      <View style={[styles.btnArea, { marginTop: 20 }]}>
+        {voltas.length > 0 && numero === "00:00:00" && timer.current === null ? (
+          <TouchableOpacity style={styles.btn} onPress={() => setShowModal(true)}>
             <Text style={styles.btnTexto}>Limpar Voltas </Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.btn, numero === "00:00:00" && { opacity: 0.5 }]}
+            onPress={marcarVolta}
+            disabled={numero === "00:00:00"}
+          >
+            <Text style={styles.btnTexto}>Volta</Text>
           </TouchableOpacity>
         )}
       </View>
 
-
+      {/* Último tempo, quando a contagem terminou */}
       <View style={styles.areaUltima}>
         <Text style={styles.textoCorrida}>
           {ultimo ? "Último tempo: " + ultimo : ""}
         </Text>
       </View>
 
+      {/* Listagem das voltas */}
       <ScrollView style={styles.voltasArea}>
         {voltas.map((tempo, index) => (
           <Text key={index} style={styles.voltaTexto}>
@@ -130,6 +148,27 @@ export default function App() {
           </Text>
         ))}
       </ScrollView>
+
+      {/* Modal */}
+      {showModal && (
+        <View style={styles.modalContainer}>
+          <View style={styles.modal}>
+            <Text style={styles.modalText}>Deseja realmente apagar todas as voltas?</Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity onPress={() => setShowModal(false)} style={[styles.btn, { backgroundColor: "#CCC" }]}>
+                <Text style={styles.btnTexto}>Cancelar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                disabled={voltas.length === 0}
+                onPress={limparVoltas}
+                style={[styles.btn, { backgroundColor: voltas.length === 0 ? "#AAA" : "#FF4444" }]}
+              >
+                <Text style={styles.btnTexto}>Apagar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
 
     </View>
   )
@@ -184,5 +223,34 @@ const styles = StyleSheet.create({
     color: "#FFF",
     fontSize: 18,
     marginBottom: 5
+  },
+  // Estilos do Modal de confirmação:
+  modalContainer: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  modal: {
+    backgroundColor: "#FFF",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    alignItems: "center"
+  },
+  modalText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 20
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%"
   },
 });
